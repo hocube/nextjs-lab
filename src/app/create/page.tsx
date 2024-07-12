@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 
 // CSS
 import styles from "./page.module.scss";
+import BasicBoard from "@/components/common/board/BasicBoard";
 
 function page() {
   return <div className={styles.container}>
@@ -32,13 +33,14 @@ function page() {
             </div>
         </header>
         <main className={styles.container__body}>
-            <div className={styles.container__body__infoBox}>
+            {/* <div className={styles.container__body__infoBox}>
                 <span className={styles.title}>There is no board yet.</span>
                 <span className={styles.subTitle}>Click the button and start flashing!</span>
                 <button className={styles.button}>
                     <Image src="/assets/images/round-button.svg" alt="round-button" width={100} height={100} />
                 </button>
-            </div>
+            </div> */}
+            <BasicBoard />
         </main>
   </div>
 }
