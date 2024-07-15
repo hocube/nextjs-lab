@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { supabase } from "@/utils/supabase"; 
+
 // Components
 import LabelCalendar from "../calendar/LabelCalendar";
 import MDEditor from "@uiw/react-md-editor";
@@ -13,9 +16,12 @@ import { useToast } from "@/components/ui/use-toast";
 
 // CSS
 import styles from "./MarkdownDialog.module.scss";
-import { useState } from "react";
 
 function MarkdownDialog() {
+    // 반응성을 가진 데이터. open 상태를 업데이트하는 용도.
+    // 다이얼로그가 열려 있는지 여부를 나타냄.
+    const [open, setOpen] = useState<boolean>(false);
+
     const [title, setTitle] = useState<string>("");
     const [content, setContent] = useState<string | undefined>("**Hello, World!!**");
     const { toast } = useToast();
@@ -23,7 +29,7 @@ function MarkdownDialog() {
     // ==========================================================================================================
 
     // Supabase에 저장
-    const onSubmit = () => {
+    const onSubmit = async() => {
         console.log("함수 호출");
 
         // 만약 title 값이나, content값이 없으면 toast UI로 error을 보여주도록.
@@ -35,12 +41,36 @@ function MarkdownDialog() {
               return;
         } else {
             // 값이 있으면 Supabase 데이터베이스에 연동
+            const { data, error, status } = await supabase
+                .from('todos')
+                .insert([{ title: title, content: content }])
+                .select()
             
+        if (error) {
+            console.log(error);
+            toast({
+                title: "에러가 발생했습니다.",
+                description: "콘솔 창에 출력된 에러를 확인하세요.",
+            })
+        }
+        /* 저장이 잘 되면 201이 전달되기 때문에 */
+        if (status === 201){
+            toast({
+                title: "생성 완료!",
+                description: "작성한 글이 Supabase에 올바르게 저장되었습니다.",
+            });
+
+            // 등록 후 조건 초기화
+            setOpen(false);
+        }
         }
     };
 
   return (
-    <Dialog>
+    // onOpenChange : Dialog 컴포넌트에서 제공하는 함수를 사용
+    // 사용자가 "Add Contents" 버튼을 클릭하여 다이얼로그를 열면 
+    // onOpenChange가 호출되어 open 상태를 true로 업데이트
+    <Dialog open={open} onOpenChange={setOpen}> 
         <DialogTrigger asChild>
             <span className="font-normal text-gray-400 hover:text-gray-500 cursor-pointer">Add Contents</span>
         </DialogTrigger>
