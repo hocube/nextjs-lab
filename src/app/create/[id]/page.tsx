@@ -45,9 +45,14 @@ function Page() {
     const insertRowData = async (contents: BoardContent[]) => {
         // Supabase 데이터베이스에 연동
         if (boards?.contents) {
-            const { data, error, status } = await supabase.from("todos").update({ contents: contents }).eq("id", pathname.split("/")[2]).select();
+            const { data, error, status } = await supabase
+            .from("todos")
+            .update({ contents: contents })
+            .eq("id", pathname.split("/")[2])
+            .select();
 
             console.log(status);
+
             if (error) {
                 console.log(error);
                 toast({
@@ -64,7 +69,11 @@ function Page() {
                 getData();
             }
         } else {
-            const { data, error, status } = await supabase.from("todos").insert({ contents: contents }).eq("id", pathname.split("/")[2]).select();
+            const { data, error, status } = await supabase
+            .from("todos")
+            .insert({ contents: contents })
+            .eq("id", pathname.split("/")[2])
+            .select();
 
             console.log(status);
 
@@ -108,11 +117,44 @@ function Page() {
         }
     };
 
-    // ====================================================================================================
+    // 특정 boardId를 가진 보드를 삭제하고, 
+    // 변경 사항을 Supabase 데이터베이스와 UI에 반영하는 함수
 
+    // boardId를 매개변수로 받음. boardId는 삭제할 보드의 식별자.
+    const deleteBoard = async (boardId: string | number) => {
+        if (!boards) return;
+
+        // 새로운 contents 배열 생성
+        // boards.contents 배열에서 boardId와 일치하지 않는 보드들만 포함한 새로운 배열 newContents를 생성
+        const newContents = boards.contents.filter((board) => board.boardId !== boardId);
+        
+        const { data, error, status } = await supabase
+            .from("todos")
+            .update({ contents: newContents })
+            .eq("id", pathname.split("/")[2])  // id 추출
+            .select();
+
+        if (error){
+            console.log(error);
+            toast({
+                title: "에러가 발생했습니다.",
+                description: "콘솔 창에 출력된 에러를 확인하세요.",
+            });
+         } else {
+            setBoards((prev) => prev && { ...prev, contents: newContents });
+                toast({
+                    title: "삭제 완료!",
+                    description: "해당 보드가 삭제되었습니다.",
+                });
+            }
+        };
+
+    // ====================================================================================================
     // Supabase에 기존에 생성된 페이지가 있는지 없는지 확인
     const getData = async () => {
-        let { data: todos, error } = await supabase.from("todos").select("*");
+        let { data: todos, error } = await supabase
+        .from("todos")
+        .select("*");
         console.log(todos);
 
         if (todos !== null) {
@@ -175,7 +217,11 @@ function Page() {
                 ) : (
                     <div className="flex flex-col items-center justify-start w-full h-full gap-4">
                         {boards?.contents.map((board: BoardContent) => {
-                            return <BasicBoard key={board.boardId} />;
+                            return <BasicBoard 
+                                        key={board.boardId}
+                                        board={board}
+                                        onDelete={deleteBoard}
+                                    />;
                         })}
                     </div>
                 )}

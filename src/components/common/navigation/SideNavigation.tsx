@@ -47,7 +47,8 @@ function SideNavigation() {
     // Supabase에 기존에 생성된 페이지가 있는지 없는지도 체크(확인)
     const getTodos = async () => {
         let { data: todos, error, status } = await supabase.from("todos").select("*");
-        
+        setTodos(todos);
+
         // 호출이 완료가 되면
         if (status === 200){
             setTodos(todos)
@@ -56,7 +57,7 @@ function SideNavigation() {
 
     useEffect(() => {
         getTodos();
-    }, [todos]);
+    }, []);
 
     return (
         <div className={styles.container}>

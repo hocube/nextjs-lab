@@ -10,7 +10,25 @@ import { ChevronUp } from "lucide-react";
 import LabelCalendar from "../calendar/LabelCalendar";
 import MarkdownDialog from "../dialog/MarkdownDialog";
 
-function BasicBoard() {
+interface BoardContent {
+    boardId: string | number;
+    isCompleted: boolean;
+    title: string;
+    stateDate: string;
+    endDate: string;
+    content: string;
+}
+interface BasicBoardProps {
+    board: BoardContent;
+    onDelete: (boardId: string | number) => void;
+}
+
+function BasicBoard({ board, onDelete }: BasicBoardProps) {
+
+    if (!board) {
+        return <div>Error: board prop is undefined</div>;
+      }
+
   return (
     <div className={styles.container}>
         <div className={styles.container__header}>
@@ -31,7 +49,8 @@ function BasicBoard() {
                 <Button variant={"ghost"} className="font-normal text-gray-400 hover:bg-green-50 hover:text-green-500">
                     Duplicate
                 </Button>
-                <Button variant={"ghost"} className="font-normal text-gray-400 hover:bg-red-50 hover:text-red-500">
+                <Button variant={"ghost"} className="font-normal text-gray-400 hover:bg-red-50 hover:text-red-500"
+                onClick={() => onDelete(board.boardId)}>
                     Delete
                 </Button>
             </div>

@@ -43,7 +43,7 @@ function MarkdownDialog() {
             // 값이 있으면 Supabase 데이터베이스에 연동
             const { data, error, status } = await supabase
                 .from('todos')
-                .insert([{ title: title, content: content }])
+                .insert([{ title: title, contents: content }])
                 .select()
             
         if (error) {
